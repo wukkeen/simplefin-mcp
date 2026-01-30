@@ -15,11 +15,11 @@ Hell yes i used claude
 ### 2. Install & Run
 
 ```bash
-git clone <your-repo-url>
+git clone # however you wanna get this
 cd simplefin-mcp
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python src/server.py
+python3 src/server.py
 ```
 
 The server listens on `0.0.0.0:8000` by default. The MCP endpoint is at `/mcp`.
