@@ -1,66 +1,77 @@
-# MCP Server Template
+# SimpleFIN MCP Server
 
-A minimal [FastMCP](https://github.com/jlowin/fastmcp) server template for Render deployment with streamable HTTP transport.
+An MCP server that connects to [SimpleFIN](https://simplefin.org) to provide financial account data — balances, transactions, and net worth — to AI agents via the [Model Context Protocol](https://modelcontextprotocol.io).
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/InteractionCo/mcp-server-template)
+Built with [FastMCP](https://github.com/jlowin/fastmcp) (Python) and deployed as a stateless HTTP service.
 
-## Local Development
+## Setup
 
-### Setup
+### 1. SimpleFIN Account
 
-Fork the repo, then run:
+1. Create a SimpleFIN account at [simplefin.org](https://simplefin.org) and connect your bank
+2. Generate a **setup token** from the SimpleFIN dashboard
+
+### 2. Install & Run
 
 ```bash
 git clone <your-repo-url>
-cd mcp-server-template
-conda create -n mcp-server python=3.13
-conda activate mcp-server
+cd simplefin-mcp
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+python src/server.py
 ```
 
-### Test
+The server listens on `0.0.0.0:8000` by default. The MCP endpoint is at `/mcp`.
+
+### 3. Claim Your Setup Token
+
+Use the `claim_setup_token` tool (via MCP Inspector or your MCP client) to exchange the setup token for an **access URL**. Then set it as an environment variable:
 
 ```bash
-python src/server.py
-# then in another terminal run:
+export SIMPLEFIN_ACCESS_URL="https://user:pass@host/simplefin"
+```
+
+Restart the server — the other tools will now authenticate against the SimpleFIN API.
+
+### 4. Connect an MCP Client
+
+Point your MCP client at the server URL with the `/mcp` path suffix (e.g. `http://localhost:8000/mcp`). Use "Streamable HTTP" transport.
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `claim_setup_token` | One-time setup — claims a SimpleFIN setup token and returns the access URL |
+| `get_accounts` | Lists all connected accounts with current balances |
+| `get_transactions` | Fetches transactions for an account within a date range (~60 day max) |
+| `get_net_worth` | Calculates total net worth across all accounts by currency |
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8000` | Server listen port |
+| `ENVIRONMENT` | `development` | Deployment environment |
+| `SIMPLEFIN_ACCESS_URL` | — | SimpleFIN credentials (`https://user:pass@host/simplefin`). Obtained via `claim_setup_token`. |
+
+## Deployment (Render)
+
+A `render.yaml` is included for deploying to [Render](https://render.com).
+
+1. Create a new Web Service on Render and connect your GitLab repository
+2. Render will detect the `render.yaml` configuration automatically
+3. Set `SIMPLEFIN_ACCESS_URL` as a secret environment variable in the Render dashboard
+
+Your server will be available at `https://your-service-name.onrender.com/mcp`.
+
+## Local Testing
+
+```bash
 npx @modelcontextprotocol/inspector
 ```
 
-Open http://localhost:3000 and connect to `http://localhost:8000/mcp` using "Streamable HTTP" transport (NOTE THE `/mcp`!).
+Open the Inspector UI and connect to `http://localhost:8000/mcp` using "Streamable HTTP" transport.
 
-## Deployment
+## License
 
-### Option 1: One-Click Deploy
-Click the "Deploy to Render" button above.
-
-### Option 2: Manual Deployment
-1. Fork this repository
-2. Connect your GitHub account to Render
-3. Create a new Web Service on Render
-4. Connect your forked repository
-5. Render will automatically detect the `render.yaml` configuration
-
-Your server will be available at `https://your-service-name.onrender.com/mcp` (NOTE THE `/mcp`!)
-
-## Poke Setup
-
-You can connect your MCP server to Poke at (poke.com/settings/connections)[poke.com/settings/connections].
-To test the connection explitly, ask poke somethink like `Tell the subagent to use the "{connection name}" integration's "{tool name}" tool`.
-If you run into persistent issues of poke not calling the right MCP (e.g. after you've renamed the connection) you may send `clearhistory` to poke to delete all message history and start fresh.
-We're working hard on improving the integration use of Poke :)
-
-
-## Customization
-
-Add more tools by decorating functions with `@mcp.tool`:
-
-```python
-@mcp.tool
-def calculate(x: float, y: float, operation: str) -> float:
-    """Perform basic arithmetic operations."""
-    if operation == "add":
-        return x + y
-    elif operation == "multiply":
-        return x * y
-    # ...
-```
+MIT

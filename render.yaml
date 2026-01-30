@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: fastmcp-server
+    name: simplefin-mcp
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: python src/server.py
@@ -9,3 +9,5 @@ services:
     envVars:
       - key: ENVIRONMENT
         value: production
+      - key: SIMPLEFIN_ACCESS_URL
+        sync: false
