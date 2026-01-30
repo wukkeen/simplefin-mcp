@@ -14,8 +14,9 @@ Hell yes i used claude
 
 ### 2. Install & Run
 
+First clone this repo and cd into it.
+   
 ```bash
-git clone # however you wanna get this
 cd simplefin-mcp
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
