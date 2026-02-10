@@ -2,6 +2,9 @@
 
 An MCP server that connects to [SimpleFIN](https://simplefin.org) to provide financial account data — balances, transactions, and net worth — to AI agents via the [Model Context Protocol](https://modelcontextprotocol.io).
 
+## Why?
+Rocketmoney is hella expensive, and was my original subscription before I learned about https://actualbudget.org/. But even then I'm way too lazy for that and we know LLMs are basically only good at data analysis, so this was made to provide quick insights I actually want to know about instead of one giant excel sheet. SimpleFin bridge itself is only $1.50/month which somehow costs about as much as the pikapod that is advertised to run it.
+
 Built with [FastMCP](https://github.com/jlowin/fastmcp) (Python) and deployed as a stateless HTTP service.
 Hell yes i used claude
 
@@ -9,8 +12,8 @@ Hell yes i used claude
 
 ### 1. SimpleFIN Account
 
-1. Create a SimpleFIN account at [simplefin.org](https://simplefin.org) and connect your bank
-2. Generate a **setup token** from the SimpleFIN dashboard
+1. Create a SimpleFIN account at [simplefin.org](https://simplefin.org) and connect your banks.
+2. Generate a **setup token** from the SimpleFIN dashboard, you will need to provide it to whatever is using the MCP.
 
 ### 2. Install & Run
 
@@ -23,11 +26,11 @@ pip install -r requirements.txt
 python3 src/server.py
 ```
 
-The server listens on `0.0.0.0:8000` by default. The MCP endpoint is at `/mcp`.
+The server listens on `0.0.0.0:8000` by default. The MCP endpoint is at `/mcp`. If you wanna change it just change the port line in 'src/server.py'
 
 ### 3. Claim Your Setup Token
 
-Use the `claim_setup_token` tool (via MCP Inspector or your MCP client) to exchange the setup token for an **access URL**. Then set it as an environment variable:
+Use the `claim_setup_token` tool (via MCP Inspector or your MCP client or Poke) to exchange the setup token for an **access URL**. With Poke you can just ask it and it will guide you through getting the token. Then set it as an environment variable:
 
 ```bash
 export SIMPLEFIN_ACCESS_URL="https://user:pass@host/simplefin"
@@ -65,6 +68,9 @@ A `render.yaml` is included for deploying to [Render](https://render.com).
 3. Set `SIMPLEFIN_ACCESS_URL` as a secret environment variable in the Render dashboard
 
 Your server will be available at `https://your-service-name.onrender.com/mcp`.
+
+## EC2
+The regular instructions were made with this in mind since it was my use case, and plain linux server t2.micro server handles it great with minimal cost.
 
 ## Local Testing
 
