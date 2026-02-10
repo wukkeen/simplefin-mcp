@@ -9,7 +9,6 @@ import httpx
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
-from fastmcp.server.transforms import ResourcesAsTools
 
 load_dotenv()
 
@@ -123,7 +122,29 @@ def simplefin_usage_guide() -> str:
     return _read_doc("simplefin-mcp-usage.md")
 
 
-mcp.add_transform(ResourcesAsTools(mcp))
+_RESOURCE_INDEX = {
+    "resource://simplefin/usage": {
+        "uri": "resource://simplefin/usage",
+        "name": "SimpleFin MCP Usage Guide",
+        "description": "Usage guide and privacy notes for the SimpleFin MCP server.",
+        "mime_type": "text/markdown",
+    }
+}
+
+
+@mcp.tool(description="List available MCP resources for tool-only clients.")
+def list_resources() -> dict:
+    return {"resources": list(_RESOURCE_INDEX.values())}
+
+
+@mcp.tool(description="Read an MCP resource by URI for tool-only clients.")
+def read_resource(uri: str) -> dict:
+    resource = _RESOURCE_INDEX.get(uri)
+    if not resource:
+        return {"success": False, "error": f"Unknown resource URI: {uri}"}
+    if uri == "resource://simplefin/usage":
+        return {"success": True, "resource": resource, "content": simplefin_usage_guide()}
+    return {"success": False, "error": f"No handler for resource URI: {uri}"}
 
 
 @mcp.tool(description=(

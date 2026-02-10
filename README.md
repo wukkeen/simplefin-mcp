@@ -75,10 +75,10 @@ Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>
 ## Tool-Only Access
 
 This server exposes resources as tools for clients that do not support MCP resources.
-The following tools are auto-generated:
+Use the following tools:
 
-- `list_resources`
-- `read_resource`
+- `list_resources` returns available resource metadata.
+- `read_resource` returns the resource content by URI.
 
 ## Environment Variables
 
