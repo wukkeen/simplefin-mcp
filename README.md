@@ -66,6 +66,20 @@ Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>
 | `get_transactions` | Fetches transactions for an account within a date range (~60 day max) |
 | `get_net_worth` | Calculates total net worth across all accounts by currency |
 
+## Resources
+
+| Resource URI | Description |
+|--------------|-------------|
+| `resource://simplefin/usage` | Usage guide and privacy notes for this MCP server |
+
+## Tool-Only Access
+
+This server exposes resources as tools for clients that do not support MCP resources.
+The following tools are auto-generated:
+
+- `list_resources`
+- `read_resource`
+
 ## Environment Variables
 
 | Variable | Default | Description |

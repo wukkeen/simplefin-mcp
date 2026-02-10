@@ -9,6 +9,7 @@ import httpx
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
+from fastmcp.server.transforms import ResourcesAsTools
 
 load_dotenv()
 
@@ -41,6 +42,15 @@ mcp = FastMCP("SimpleFIN MCP Server", auth=_build_auth())
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+_DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "docs"))
+
+
+def _read_doc(filename: str) -> str:
+    path = os.path.join(_DOCS_DIR, filename)
+    with open(path, "r", encoding="utf-8") as handle:
+        return handle.read()
+
 
 def _parse_access_url() -> tuple[str, str, str]:
     """Parse SIMPLEFIN_ACCESS_URL into (base_url, username, password).
@@ -102,6 +112,19 @@ async def _simplefin_get(endpoint: str, params: dict | None = None) -> dict:
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
+
+@mcp.resource(
+    "resource://simplefin/usage",
+    name="SimpleFin MCP Usage Guide",
+    description="Usage guide and privacy notes for the SimpleFin MCP server.",
+    mime_type="text/markdown",
+)
+def simplefin_usage_guide() -> str:
+    return _read_doc("simplefin-mcp-usage.md")
+
+
+mcp.add_transform(ResourcesAsTools(mcp))
+
 
 @mcp.tool(description=(
     "One-time setup: claim a SimpleFIN setup token to obtain an access URL. "
