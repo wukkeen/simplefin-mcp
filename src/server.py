@@ -6,14 +6,50 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 import httpx
+from dotenv import load_dotenv
 from fastmcp import FastMCP
+from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
 
-mcp = FastMCP("SimpleFIN MCP Server")
+load_dotenv()
+
+
+def _build_auth() -> StaticTokenVerifier | None:
+    token = os.environ.get("SIMPLEFIN_MCP_TOKEN", "").strip()
+    if token:
+        return StaticTokenVerifier(
+            tokens={
+                token: {
+                    "client_id": "simplefin-mcp",
+                    "scopes": ["simplefin:read"],
+                }
+            },
+            required_scopes=["simplefin:read"],
+        )
+
+    environment = os.environ.get("ENVIRONMENT", "development").strip().lower()
+    if environment == "production":
+        raise ValueError(
+            "SIMPLEFIN_MCP_TOKEN is not set. "
+            "Set it to a strong random value and provide it as a Bearer token."
+        )
+    return None
+
+
+mcp = FastMCP("SimpleFIN MCP Server", auth=_build_auth())
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+_DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "docs"))
+
+
+def _read_doc(filename: str) -> str:
+    path = os.path.join(_DOCS_DIR, filename)
+    with open(path, "r", encoding="utf-8") as handle:
+        return handle.read()
+
 
 def _parse_access_url() -> tuple[str, str, str]:
     """Parse SIMPLEFIN_ACCESS_URL into (base_url, username, password).
@@ -75,6 +111,41 @@ async def _simplefin_get(endpoint: str, params: dict | None = None) -> dict:
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
+
+@mcp.resource(
+    "resource://simplefin/usage",
+    name="SimpleFin MCP Usage Guide",
+    description="Usage guide and privacy notes for the SimpleFin MCP server.",
+    mime_type="text/markdown",
+)
+def simplefin_usage_guide() -> str:
+    return _read_doc("simplefin-mcp-usage.md")
+
+
+_RESOURCE_INDEX = {
+    "resource://simplefin/usage": {
+        "uri": "resource://simplefin/usage",
+        "name": "SimpleFin MCP Usage Guide",
+        "description": "Usage guide and privacy notes for the SimpleFin MCP server.",
+        "mime_type": "text/markdown",
+    }
+}
+
+
+@mcp.tool(description="List available MCP resources for tool-only clients.")
+def list_resources() -> dict:
+    return {"resources": list(_RESOURCE_INDEX.values())}
+
+
+@mcp.tool(description="Read an MCP resource by URI for tool-only clients.")
+def read_resource(uri: str) -> dict:
+    resource = _RESOURCE_INDEX.get(uri)
+    if not resource:
+        return {"success": False, "error": f"Unknown resource URI: {uri}"}
+    if uri == "resource://simplefin/usage":
+        return {"success": True, "resource": resource, "content": simplefin_usage_guide()}
+    return {"success": False, "error": f"No handler for resource URI: {uri}"}
+
 
 @mcp.tool(description=(
     "One-time setup: claim a SimpleFIN setup token to obtain an access URL. "
@@ -281,7 +352,12 @@ async def get_net_worth() -> dict:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port_raw = os.environ.get("PORT", "").strip()
+    if not port_raw:
+        raise ValueError(
+            "PORT is not set. Set PORT to the port you want the server to bind to."
+        )
+    port = int(port_raw)
     host = "0.0.0.0"
 
     print(f"Starting SimpleFIN MCP server on {host}:{port}")
