@@ -7,8 +7,32 @@ from urllib.parse import urlparse
 
 import httpx
 from fastmcp import FastMCP
+from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
 
-mcp = FastMCP("SimpleFIN MCP Server")
+
+def _build_auth() -> StaticTokenVerifier | None:
+    token = os.environ.get("SIMPLEFIN_MCP_TOKEN", "").strip()
+    if token:
+        return StaticTokenVerifier(
+            tokens={
+                token: {
+                    "client_id": "simplefin-mcp",
+                    "scopes": ["simplefin:read"],
+                }
+            },
+            required_scopes=["simplefin:read"],
+        )
+
+    environment = os.environ.get("ENVIRONMENT", "development").strip().lower()
+    if environment == "production":
+        raise ValueError(
+            "SIMPLEFIN_MCP_TOKEN is not set. "
+            "Set it to a strong random value and provide it as a Bearer token."
+        )
+    return None
+
+
+mcp = FastMCP("SimpleFIN MCP Server", auth=_build_auth())
 
 
 # ---------------------------------------------------------------------------
@@ -281,7 +305,12 @@ async def get_net_worth() -> dict:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port_raw = os.environ.get("PORT", "").strip()
+    if not port_raw:
+        raise ValueError(
+            "PORT is not set. Set PORT to the port you want the server to bind to."
+        )
+    port = int(port_raw)
     host = "0.0.0.0"
 
     print(f"Starting SimpleFIN MCP server on {host}:{port}")

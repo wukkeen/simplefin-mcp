@@ -23,12 +23,21 @@ First clone this repo and cd into it.
 cd simplefin-mcp
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+export PORT=8000
 python3 src/server.py
 ```
 
-The server listens on `0.0.0.0:8000` by default. The MCP endpoint is at `/mcp`. If you wanna change it just change the port line in 'src/server.py'
+The server listens on `0.0.0.0:$PORT`. The MCP endpoint is at `/mcp`. Set `PORT` to change the listen port.
 
-### 3. Claim Your Setup Token
+### 3. Set an MCP Access Token
+
+Set a strong random token in the environment. This token is required in the `Authorization: Bearer <token>` header for all MCP requests (unless `ENVIRONMENT` is not `production`).
+
+```bash
+export SIMPLEFIN_MCP_TOKEN="your-strong-random-token"
+```
+
+### 4. Claim Your Setup Token
 
 Use the `claim_setup_token` tool (via MCP Inspector or your MCP client or Poke) to exchange the setup token for an **access URL**. With Poke you can just ask it and it will guide you through getting the token. Then set it as an environment variable:
 
@@ -38,9 +47,14 @@ export SIMPLEFIN_ACCESS_URL="https://user:pass@host/simplefin"
 
 Restart the server — the other tools will now authenticate against the SimpleFIN API.
 
-### 4. Connect an MCP Client
+### 5. Connect an MCP Client
 
 Point your MCP client at the server URL with the `/mcp` path suffix (e.g. `http://localhost:8000/mcp`). Use "Streamable HTTP" transport.
+Include the bearer token header:
+
+```
+Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>
+```
 
 ## Tools
 
@@ -55,9 +69,10 @@ Point your MCP client at the server URL with the `/mcp` path suffix (e.g. `http:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `8000` | Server listen port |
+| `PORT` | — | Server listen port (required). Render sets this automatically. |
 | `ENVIRONMENT` | `development` | Deployment environment |
 | `SIMPLEFIN_ACCESS_URL` | — | SimpleFIN credentials (`https://user:pass@host/simplefin`). Obtained via `claim_setup_token`. |
+| `SIMPLEFIN_MCP_TOKEN` | — | Bearer token required for MCP requests. |
 
 ## Deployment (Render)
 
@@ -66,6 +81,7 @@ A `render.yaml` is included for deploying to [Render](https://render.com).
 1. Create a new Web Service on Render and connect your GitLab repository
 2. Render will detect the `render.yaml` configuration automatically
 3. Set `SIMPLEFIN_ACCESS_URL` as a secret environment variable in the Render dashboard
+4. Set `SIMPLEFIN_MCP_TOKEN` as a secret environment variable in the Render dashboard
 
 Your server will be available at `https://your-service-name.onrender.com/mcp`.
 
@@ -79,6 +95,7 @@ npx @modelcontextprotocol/inspector
 ```
 
 Open the Inspector UI and connect to `http://localhost:8000/mcp` using "Streamable HTTP" transport.
+Set the `Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>` header in the Inspector connection settings.
 
 ## License
 
