@@ -2,12 +2,12 @@
 
 An MCP server that connects to [SimpleFIN](https://simplefin.org) to provide financial account data — balances, transactions, and net worth — to AI agents via the [Model Context Protocol](https://modelcontextprotocol.io).
 
-Well yes i used claude and codex.
+Built with [FastMCP](https://github.com/jlowin/fastmcp) (Python) and deployed as a stateless HTTP service.
 
 ## Why?
 Rocketmoney is hella expensive, and was my original subscription before I learned about https://actualbudget.org/. But even then I'm way too lazy for that and we know LLMs are basically only good at data analysis, so this was made to provide quick insights I actually want to know about instead of one giant excel sheet. SimpleFin bridge itself is only $1.50/month which somehow costs about as much as the pikapod that is advertised to run it.
 
-Built with [FastMCP](https://github.com/jlowin/fastmcp) (Python) and deployed as a stateless HTTP service.
+Hell yes i used claude and codex.
 
 ## Setup
 
