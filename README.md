@@ -97,6 +97,8 @@ If you prefer a managed deploy instead of running your own VM, a `render.yaml` i
 
 Your server will be available at `https://your-service-name.onrender.com/mcp`.
 
+If there are issues with this method (which there probably are), feel free to create an issue and I will do my best.
+
 ## Local Testing
 
 ```bash
