@@ -30,12 +30,12 @@ python3 src/server.py
 
 The server listens on `0.0.0.0:$PORT`. The MCP endpoint is at `/mcp`. Set `PORT` to change the listen port.
 
-### 3. Set an MCP Access Token
+### 3. Set an MCP API Key
 
-Set a strong random token in the environment (or in `.env`). This token is required in the `Authorization: Bearer <token>` header for all MCP requests (unless `ENVIRONMENT` is not `production`).
+Set a strong random API key in the environment (or in `.env`). This key is required in the `Authorization: Bearer <token>` header for all MCP requests (unless `ENVIRONMENT` is not `production`).
 
 ```bash
-export SIMPLEFIN_MCP_TOKEN="your-strong-random-token"
+export SIMPLEFIN_MCP_API_KEY="your-strong-random-token"
 ```
 
 ### 4. Claim Your Setup Token
@@ -54,7 +54,7 @@ Point your MCP client at the server URL with the `/mcp` path suffix (e.g. `http:
 Include the bearer token header:
 
 ```
-Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>
+Authorization: Bearer <SIMPLEFIN_MCP_API_KEY>
 ```
 
 ## Tools
@@ -87,7 +87,7 @@ Use the following tools:
 | `PORT` | — | Server listen port (required). Render sets this automatically. |
 | `ENVIRONMENT` | `development` | Deployment environment |
 | `SIMPLEFIN_ACCESS_URL` | — | SimpleFIN credentials (`https://user:pass@host/simplefin`). Obtained via `claim_setup_token`. |
-| `SIMPLEFIN_MCP_TOKEN` | — | Bearer token required for MCP requests. |
+| `SIMPLEFIN_MCP_API_KEY` | — | Bearer token required for MCP requests. |
 
 The server reads environment variables from a local `.env` file if present.
 
@@ -98,7 +98,7 @@ A `render.yaml` is included for deploying to [Render](https://render.com).
 1. Create a new Web Service on Render and connect your GitLab repository
 2. Render will detect the `render.yaml` configuration automatically
 3. Set `SIMPLEFIN_ACCESS_URL` as a secret environment variable in the Render dashboard
-4. Set `SIMPLEFIN_MCP_TOKEN` as a secret environment variable in the Render dashboard
+4. Set `SIMPLEFIN_MCP_API_KEY` as a secret environment variable in the Render dashboard
 
 Your server will be available at `https://your-service-name.onrender.com/mcp`.
 
@@ -112,7 +112,7 @@ npx @modelcontextprotocol/inspector
 ```
 
 Open the Inspector UI and connect to `http://localhost:8000/mcp` using "Streamable HTTP" transport.
-Set the `Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>` header in the Inspector connection settings.
+Set the `Authorization: Bearer <SIMPLEFIN_MCP_API_KEY>` header in the Inspector connection settings.
 
 ## License
 

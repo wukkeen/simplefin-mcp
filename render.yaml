@@ -11,5 +11,5 @@ services:
         value: production
       - key: SIMPLEFIN_ACCESS_URL
         sync: false
-      - key: SIMPLEFIN_MCP_TOKEN
+      - key: SIMPLEFIN_MCP_API_KEY
         sync: false

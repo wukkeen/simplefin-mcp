@@ -14,7 +14,9 @@ load_dotenv()
 
 
 def _build_auth() -> StaticTokenVerifier | None:
-    token = os.environ.get("SIMPLEFIN_MCP_TOKEN", "").strip()
+    token = os.environ.get("SIMPLEFIN_MCP_API_KEY", "").strip()
+    if not token:
+        token = os.environ.get("SIMPLEFIN_MCP_TOKEN", "").strip()
     if token:
         return StaticTokenVerifier(
             tokens={
@@ -29,7 +31,7 @@ def _build_auth() -> StaticTokenVerifier | None:
     environment = os.environ.get("ENVIRONMENT", "development").strip().lower()
     if environment == "production":
         raise ValueError(
-            "SIMPLEFIN_MCP_TOKEN is not set. "
+            "SIMPLEFIN_MCP_API_KEY is not set. "
             "Set it to a strong random value and provide it as a Bearer token."
         )
     return None
