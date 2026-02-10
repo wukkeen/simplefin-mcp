@@ -6,8 +6,11 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 import httpx
+from dotenv import load_dotenv
 from fastmcp import FastMCP
 from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
+
+load_dotenv()
 
 
 def _build_auth() -> StaticTokenVerifier | None:

@@ -23,7 +23,8 @@ First clone this repo and cd into it.
 cd simplefin-mcp
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-export PORT=8000
+cp .env.example .env
+${EDITOR:-nano} .env
 python3 src/server.py
 ```
 
@@ -31,7 +32,7 @@ The server listens on `0.0.0.0:$PORT`. The MCP endpoint is at `/mcp`. Set `PORT`
 
 ### 3. Set an MCP Access Token
 
-Set a strong random token in the environment. This token is required in the `Authorization: Bearer <token>` header for all MCP requests (unless `ENVIRONMENT` is not `production`).
+Set a strong random token in the environment (or in `.env`). This token is required in the `Authorization: Bearer <token>` header for all MCP requests (unless `ENVIRONMENT` is not `production`).
 
 ```bash
 export SIMPLEFIN_MCP_TOKEN="your-strong-random-token"
@@ -39,7 +40,7 @@ export SIMPLEFIN_MCP_TOKEN="your-strong-random-token"
 
 ### 4. Claim Your Setup Token
 
-Use the `claim_setup_token` tool (via MCP Inspector or your MCP client or Poke) to exchange the setup token for an **access URL**. With Poke you can just ask it and it will guide you through getting the token. Then set it as an environment variable:
+Use the `claim_setup_token` tool (via MCP Inspector or your MCP client or Poke) to exchange the setup token for an **access URL**. With Poke you can just ask it and it will guide you through getting the token. Then set it as an environment variable (or in `.env`):
 
 ```bash
 export SIMPLEFIN_ACCESS_URL="https://user:pass@host/simplefin"
@@ -73,6 +74,8 @@ Authorization: Bearer <SIMPLEFIN_MCP_TOKEN>
 | `ENVIRONMENT` | `development` | Deployment environment |
 | `SIMPLEFIN_ACCESS_URL` | — | SimpleFIN credentials (`https://user:pass@host/simplefin`). Obtained via `claim_setup_token`. |
 | `SIMPLEFIN_MCP_TOKEN` | — | Bearer token required for MCP requests. |
+
+The server reads environment variables from a local `.env` file if present.
 
 ## Deployment (Render)
 
